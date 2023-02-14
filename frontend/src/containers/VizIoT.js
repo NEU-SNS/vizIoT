@@ -1,8 +1,8 @@
 'use es6';
 
-import React, {PureComponent} from 'react';
+import React, {PureComponent, useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
-import {Redirect, Switch, Route} from 'react-router-dom';
+import {useLocation, Outlet, useNavigate} from 'react-router-dom'
 import styled from 'styled-components';
 
 import TabTitle from '../components/TabTitle';
@@ -46,44 +46,46 @@ const BackgroundRelative = styled.div`
   position: relative;
 `;
 
-class VizIoT extends React.Component {
-  state = {
-    redirectTo: null,
-    showTitle: true,
-    scheduler: null,
-    showNav: false,
-  };
+const VizIoT = () => {
+   
+  const location = useLocation()
+  const navigate = useNavigate()
+  // const [redirectTo, setRedirectTo] = useState(null)
+  const [showTitle, setShowTitle] = useState(true)
+  const [scheduler, setScheduler] = useState(null)
+  const [showNav, setShowNav] = useState(false)
+  
+  // After we receive new or changed location, reset redirect when location === redirectTo.
+  // Don't really understand what this is for. redirectTo is always null????
+  // useEffect(() => {
+  //   const {pathname} = location
+  //   if (pathname === redirectTo) {
+  //     setRedirectTo(null)
+  //   }
+  // }, [location])
 
-  componentWillReceiveProps(props) {
-    const {
-      location: {pathname},
-    } = props;
-    this.setState(({redirectTo}) => ({
-      // After we receive new or changed props, reset redirect when location === redirectTo.
-      redirectTo: pathname === redirectTo ? null : redirectTo,
-    }));
-  }
+  useEffect(() => {
+    const {pathname} = location
+    if (pathname === '/') {
+      navigate('/overview')
+    }
+  }, [location])
 
-  componentDidMount() {
-    this.scheduleHideTitle();
-    document.addEventListener('keydown', this.handleKeyDown);
-  }
 
-  componentWillUnmount() {
-    document.addEventListener('keydown', this.handleKeyDown);
-  }
+  useEffect(() => {
+    scheduleHideTitle();
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [])
+ 
 
-  scheduleHideTitle = () => {
-    const {scheduler} = this.state;
+  const scheduleHideTitle = () => {
     scheduler && clearTimeout(scheduler);
-
-    this.setState(() => ({
-      scheduler: setTimeout(() => {
-        this.setState({
-          showTitle: false,
-        });
-      }, 6000),
-    }));
+    setScheduler(setTimeout(() => {
+      setShowTitle(false)
+    }, 6000))
   };
 
   // handleRightArrow = () => {
@@ -99,90 +101,43 @@ class VizIoT extends React.Component {
   //   }
   // };
 
-  onToggleNav = () => {
-    this.setState({
-      showNav: !this.state.showNav,
-    });
+  const onToggleNav = () => {
+    setShowNav(state => !state)
   };
 
-  handleKeyDown = e => {
+  const handleKeyDown = e => {
     if (e.key === 'i') {
       e.preventDefault();
-      this.onToggleNav();
+      onToggleNav();
     }
   };
 
-  render() {
-    const {redirectTo, showNav, showTitle} = this.state;
-    const {location} = this.props;
+    // Don't really understand what this is for. redirectTo is always null????
+    // if (redirectTo && redirectTo !== location.pathname) {
+    //   // Redirect triggers when state is changed
+    //   return <Redirect to={redirectTo}/>;
+    // }
 
-    // If the current location is diff from the state's index
-    if (redirectTo && redirectTo !== location.pathname) {
-      // Redirect triggers when state is changed
-      return <Redirect to={redirectTo}/>;
-    }
+  const title = pathOr('', ['title'], getTabByPath(location.pathname));
 
-    const title = pathOr('', ['title'], getTabByPath(location.pathname));
-
-    return (
-      <div id="root-container">
-        <VideoBackground/>
-        <TabTitle subtitle={title} show={showTitle}/>
-        <div>
-          <AppMenuBar toggleNav={this.onToggleNav.bind(this)} showNav={showNav}/>
-          <Navigator location={location} isHidden={!showNav}/>
-          {/*<ActivitySidebar />*/}
-          <CoverFlow
-            keyName={location.pathname}
-            onLeft={this.handleLeftArrow}
-            onRight={this.handleRightArrow}
-          >
-            <Switch location={location}>
-              {/*<Route*/}
-              {/*  path={`${Tabs[tabKeys.LOGGER].path}`}*/}
-              {/*  component={LoggerContainer}*/}
-              {/*/>*/}
-              <Route
-                path={`${Tabs[tabKeys.OVERVIEW].path}`}
-                component={OverviewTab}
-              />
-              <Route
-                exact
-                path={`${Tabs[tabKeys.DEVICES].path}`}
-                component={DeviceOverview}
-              />
-              {/*<Route*/}
-              {/*  exact*/}
-              {/*  path={`${Tabs[tabKeys.TIME].path}`}*/}
-              {/*  component={TimeOverview}*/}
-              {/*/>*/}
-              {/*<Route*/}
-              {/*  exact*/}
-              {/*  path={`${Tabs[tabKeys.DESTINATIONS].path}`}*/}
-              {/*  component={BubbleLocationTab}*/}
-              {/*/>*/}
-              <Route
-                exact
-                path={`${Tabs[tabKeys.INOUT].path}`}
-                component={SentReceivedTab}
-              />
-              <Route
-                exact
-                path={`${Tabs[tabKeys.PROTOCOL].path}`}
-                component={ProtocolTab}
-              />
-              <Route
-                exact
-                path={`${Tabs[tabKeys.CONNECTION_TABLE].path}`}
-                component={ConnectionTableTab}
-              />
-              <Route render={() => <NotFound/>}/>
-            </Switch>
-          </CoverFlow>
-        </div>
+  return (
+    <div id="root-container">
+      <VideoBackground/>
+      <TabTitle subtitle={title} show={showTitle}/>
+      <div>
+        <AppMenuBar toggleNav={onToggleNav} showNav={showNav}/>
+        <Navigator location={location} isHidden={!showNav}/>
+        {/*<ActivitySidebar />*/}
+        <CoverFlow
+          keyName={location.pathname}
+          // onLeft={handleLeftArrow}
+          // onRight={handleRightArrow}
+        >
+          <Outlet/>
+        </CoverFlow>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 VizIoT.defaultProps = {

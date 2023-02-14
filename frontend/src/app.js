@@ -9,6 +9,7 @@ import 'normalize.css/normalize.css';
 import './styles/app.scss';
 import whyDidYouUpdate from 'why-did-you-update';
 import SocketProvider from './components/BeanUILibrary/provider/SocketProvider';
+import {Navigate, useRoutes, BrowserRouter, Routes, Route, HashRouter} from 'react-router-dom'
 
 if (process.env.NODE_ENV !== 'production') {
   // whyDidYouUpdate(React);
@@ -18,12 +19,14 @@ const store = configureStore();
 // store.dispatch(actionStartStream({ dispatch: store.dispatch }));
 
 const jsx = (
-  <Provider store={store}>
-    <SocketProvider>
-      <AppRouter/>
-    </SocketProvider>
-  </Provider>
-);
+  <HashRouter>
+    <Provider store={store}>
+      <SocketProvider>
+        <AppRouter/>
+      </SocketProvider>
+    </Provider>
+  </HashRouter>
+)
 
 const renderApp = () => {
   const appRoot = document.getElementById('app');
