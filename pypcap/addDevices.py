@@ -1,7 +1,7 @@
 from pymongo import MongoClient
-from config import MONGO_DB_ADDRESS
+from config import mongo_uri
 
-client = MongoClient(MONGO_DB_ADDRESS, serverSelectionTimeoutMS=1)
+client = MongoClient(mongo_uri, serverSelectionTimeoutMS=1)
 scapy_database = client['scapy']
 device_collection = scapy_database['devices']
   # .with_options(write_concern=writeConcern)

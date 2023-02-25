@@ -55,7 +55,7 @@ class Server {
         initSocketIO(this.http)
 
         // start server
-        this.http.listen(this.config.apiPort, () => {
+        this.http.listen(this.config.apiPort, this.config.ip, () => {
           console.log(`[Server] listening on port ${this.config.apiPort}`)
         })
       })
