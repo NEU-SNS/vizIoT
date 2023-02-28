@@ -1,22 +1,22 @@
-@import "/base/settings";
-@import "/base/mixins/base";
-@import "/base/classes/base";
+@import "./base/settings";
+@import "./base/mixins/base";
+@import "./base/classes/base";
 
-@import "/base/base";
-@import "/base/grid";
+@import "./base/base";
+@import "./base/grid";
 
-@import "/components/tabTitle";
-@import "/components/barChart";
-@import "/components/deviceListItem";
-@import "/components/deviceList";
-@import "/components/bubbleChart";
-@import "/components/dataWell";
-@import "/components/coverFlow";
-@import "/components/temporalHeatTable";
+@import "./components/tabTitle";
+@import "./components/barChart";
+@import "./components/deviceListItem";
+@import "./components/deviceList";
+@import "./components/bubbleChart";
+@import "./components/dataWell";
+@import "./components/coverFlow";
+@import "./components/temporalHeatTable";
 
-@import "/containers/locationTab";
-@import "/containers/overviewTab";
-@import "/containers/playground";
+@import "./containers/locationTab";
+@import "./containers/overviewTab";
+@import "./containers/playground";
 
 #root-container {
   position: relative;

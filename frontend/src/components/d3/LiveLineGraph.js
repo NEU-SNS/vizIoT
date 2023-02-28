@@ -103,7 +103,7 @@ class RollingXAxis extends Component {
       .range([0, width]);
 
     const xAxis = axisBottom(x)
-      .ticks(timeSecond, 10)
+      .ticks(timeSecond.every(10))  // I don't know why the original code doesn't work after upgrade 
       .tickFormat(d => `${selectXAxisTicks(d)}s ago`);
 
     const xAxisNode = node.select('.xAxis').call(redrawXAxis(xAxis));
@@ -209,7 +209,7 @@ class LiveLineGraph extends Component {
     this.setState({redraw: false});
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     this.setState(() => this.mapPropsToState(newProps));
   }
 
@@ -260,7 +260,7 @@ class LiveLineGraph extends Component {
 
     // Axis Settings
     const xAxis = axisBottom(x)
-      .ticks(timeSecond, 10)
+      .ticks(timeSecond.every(10))
       .tickFormat(d => `${moment().diff(moment(d), 'seconds')}s ago`);
     const yMin = y.domain()[0];
     const yMax = axisMax;

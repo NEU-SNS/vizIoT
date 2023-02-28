@@ -83,7 +83,7 @@ DataTable.propTypes = {
     key: PropTypes.string,
     width: PropTypes.number,
   })).isRequired,
-  rowData: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.any)).isRequired,
+  rowData: PropTypes.arrayOf(PropTypes.object).isRequired,
   children: PropTypes.any,
   rowHeight: PropTypes.number,
   headerHeight: PropTypes.number,

@@ -38,7 +38,7 @@ export const AllDevicesRow = ({isEnabled, setEnabled}) => {
                                                    }}>
     <label className='container'>
       <DeviceHeader>All</DeviceHeader>
-      <input checked={isEnabled} type='checkbox' onClick={() => {setEnabled(!isEnabled)}}/>
+      <input checked={isEnabled} type='checkbox' onChange={() => {setEnabled(!isEnabled)}}/>
       <span className='checkmark'>{isEnabled ? drawX() : ''}</span>
     </label>
   </BorderedSolidRow>

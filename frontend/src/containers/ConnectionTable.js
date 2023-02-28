@@ -163,7 +163,7 @@ export const ConnectionTable = ({
         height={headerSize}
         width={width}
       />
-      {displayConnections.map(conn => {
+      {displayConnections.map((conn, index) => {
         ++renderIndex;
         // console.log(conn)
         // console.log(packets)
@@ -177,6 +177,7 @@ export const ConnectionTable = ({
         }
         // console.log(currentPackets)
         return <TableRow
+          key={index}
           name={conn.name}
           destName={conn.destName}
           data={currentPackets ? currentPackets : []}
@@ -194,8 +195,9 @@ export const ConnectionTable = ({
           width={width}
         />
       })}
-      {[...Array(rows - renderIndex)].map(x => {
+      {[...Array(rows - renderIndex)].map((x, index) => {
         return <BlankRow
+          key={index}
           sentColor={sentColor}
           receivedColor={receivedColor}
           height={rowSize}
@@ -214,7 +216,7 @@ ConnectionTable.propTypes = {
   xTicks: PropTypes.number,
   sentColor: PropTypes.string,
   receivedColor: PropTypes.string,
-  height: PropTypes.number.isRequired,
+  height: PropTypes.string.isRequired,
   devices: PropTypes.object.isRequired,
 }
 

@@ -105,8 +105,9 @@ export const SelectableDeviceList = ({
     <ConnectionCard style={{height: '92%'}}>
       <AllDevicesRow isEnabled={allDevices} setEnabled={setAllDevicesList}/>
       <div style={{paddingTop:'4px'}}/>
-      {Object.keys(devices).sort().map(key => {
+      {Object.keys(devices).sort().map((key, index) => {
         return <SingleDeviceRow
+          key={index}
           isEnabled={devices[key].selected}
           setEnabled={devices[key].setSelected}
           name={devices[key].name} />
@@ -117,7 +118,7 @@ export const SelectableDeviceList = ({
 }
 
 SelectableDeviceList.propTypes = {
-  height: PropTypes.number.isRequired,
+  height: PropTypes.string.isRequired,
   devices: PropTypes.object.isRequired,
   setDevices: PropTypes.func.isRequired,
   setForceVal: PropTypes.func.isRequired,

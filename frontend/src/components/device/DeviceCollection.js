@@ -20,6 +20,7 @@ import {
   sizeTotalToday
 } from 'VizIoT/data/device/DeviceDataLenses';
 import moment from 'moment';
+import { DeviceData } from 'VizIoT/data/device/DeviceData';
 
 const StyledTable = styled(DataTable)`
   margin-bottom: 50px;
@@ -192,7 +193,7 @@ class DeviceCollection extends Component {
 
             return (
               <DeviceCardWrapper
-                key={_id}
+                key={macAddress}
                 size={{xs: 12, sm: 12, md: 12, lg: 6, xl: 4, xxl: 4, xxxl: 2}}
                 space="m-bot-4"
               >
@@ -303,10 +304,7 @@ class DeviceCollection extends Component {
 
 DeviceCollection.propTypes = {
   devices: PropTypes.array.isRequired,
-  deviceToData: PropTypes.objectOf({
-    velocity: PropTypes.number,
-    total: PropTypes.number,
-  }),
+  deviceToData: PropTypes.objectOf(PropTypes.instanceOf(DeviceData)),
   mode: PropTypes.oneOf(['CARD', 'LIST']),
   chartConfig: PropTypes.object.isRequired,
 };

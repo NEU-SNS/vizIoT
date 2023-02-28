@@ -1,7 +1,7 @@
 'use es6';
 
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client'
 import {Provider} from 'react-redux';
 import AppRouter from './routers/AppRouter';
 import configureStore from './store/configureStore';
@@ -28,11 +28,10 @@ const jsx = (
   </HashRouter>
 )
 
-const renderApp = () => {
-  const appRoot = document.getElementById('app');
-  ReactDOM.render(jsx, appRoot);
-};
-renderApp();
+// upgrade React
+const appRoot = document.getElementById('app');
+const root = createRoot(appRoot);
+root.render(jsx);
 
 // const requireAuthentication = (WrappedComponent) => {
 //   return (props) => (

@@ -44,7 +44,7 @@ class BubbleChart extends Component {
     // this.redrawChart();
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     // this.redrawChart();
 
     this.setState(() => {

@@ -1,7 +1,12 @@
 function initSocketIO(http) {
 
-  const Server = require('socket.io')
-  const io = new Server(http)
+  const { Server } = require('socket.io')
+  // Since Socket.IO v3, you need to explicitly enable CORS
+  const io = new Server(http, {
+    cors: {
+      origin: "*"
+    }
+  })
   const TcpDataDa = require('./api/tcpData/tcpData.da')
 
 

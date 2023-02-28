@@ -1,6 +1,6 @@
 'use es6';
 
-import openSocket from 'socket.io-client';
+import { io } from 'socket.io-client';
 import {baseUrl} from '../constants/RequestConstants';
 
 export const url = `${baseUrl}/chat`;
@@ -17,7 +17,7 @@ export const createSocket = customUrl => {
     return;
   }
   // debugger
-  const socket = openSocket.connect(connectUrl);
+  const socket = io(connectUrl);
   socket.on('connect', () => {
     console.log(`connected: ${connectUrl}`);
   });
