@@ -1,6 +1,6 @@
 
 from pymongo import MongoClient
-from config import mongo_uri
+from config import mongo_uri, database_name
 import time
 import logging
 
@@ -11,7 +11,7 @@ ETHER = 'Ether'
 
 # writeConcern = pymongo.write_concern.WriteConcern(w=0, wtimeout=None, j=None, fsync=None)
 client = MongoClient(mongo_uri, serverSelectionTimeoutMS=1)
-scapy_database = client['scapy']
+scapy_database = client[database_name]
 tcpAggregatedDataString = 'tcpAggregatedData'
 tcp_aggregated_data_collection = scapy_database[tcpAggregatedDataString]
 

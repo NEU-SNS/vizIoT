@@ -1,6 +1,6 @@
 import configparser
 import os
-from setup_viziot import run, stop
+from setup_viziot import run, stop, get_db_uri_from
 import sys
 
 red = '\033[31m'
@@ -10,72 +10,53 @@ reset = '\033[0m'
 config = configparser.ConfigParser()
 path = 'viziot.conf'
 
-pypcap_properties = ["iface", "database_name", "database_ip", "database_port", "database_username", "database_password", {"name": "ips", "value": ["ip", "name"]}]
-pypcap_properties_names = ["iface", "database_name", "database_ip",
-                           "database_port", "database_username", "database_password", "ips"]
-backend_properties = ["database_name", "database_ip",
-                      "database_port", "database_username", "database_password", "backend_ip", "backend_port"]
+pypcap_properties = ["iface", "database_name", "database_ip", "database_port", "database_username", "database_password", "database_authsource"]
+backend_properties = ["database_name", "database_ip", "database_port", "database_username", "database_password", "database_authsource", "backend_ip", "backend_port"]
 frontend_properties = ["backend_ip", "backend_port", "frontend_ip", "frontend_port"]
 
-parts = {
-    "pypcap": {
-        "pypcap_properties": pypcap_properties,
-        "pypcap_properties_names": pypcap_properties_names,
-    },
-    "backend": {
-        "backend_properties": backend_properties
-    },
-    "frontend": {
-        "frontend_properties": frontend_properties
-    }
+property_dict = {
+    "pypcap": pypcap_properties,
+    "backend": backend_properties,
+    "frontend": frontend_properties
 }
 
 def add_single_value(property):
     return input("Please set {0}:\n".format(property)).strip()
 
-def add_multiple_values(property, keys):
-    result = []
-    count = 1
-
-    print("Start setting {0}. Return \"|\" anytime to stop.".format(property))
-
-    while True:
-        print('Set #{0}: '.format(count))
-        dict = {}
-        for key in keys:
-            value = input("{0}: ".format(key)).strip()
-            if value == "|":
-                return result
-
-            dict[key] = value
-        result.append(dict)
-        count += 1
+def check_iface():
+    iface = config.get("pypcap", "iface")
+    ifaces = []
+    result = os.popen("sudo ifconfig")
+    ifaces_info = result.read().strip().split('\n\n')
+    for iface_info in ifaces_info:
+        ifaces.append(iface_info[: iface_info.find(':')])
+    
+    return iface in ifaces, ifaces
 
 # used when the configuration file doesn't have the corresponding section
 def create_config(part, properties):
     print("\nStart setting configuration for {0}!".format(part))
-    new_config = {'autostart': 'yes'}
+    new_config = {}
 
     for property in properties:
-        if isinstance(property, dict):
-            new_config[property["name"]] = add_multiple_values(property["name"], property["value"])
-        else:
-            if property in ["database_ip", "backend_ip", "frontend_ip"]:
-                ip = input("Do you want to set 'localhost' as {0}? If so, press enter. If not, please enter an ip. ".format(property)).strip()
-                if ip == "":
-                    new_config[property] = "localhost"
-                else:
-                    new_config[property] = ip
-            elif property == "database_port":
-                database_port = input("Do you want to set '27017' as {0}? ('27017' is the default port of MongoDB) If so, press enter. If not, please enter a port. ".format(property)).strip()
-                if database_port == "":
-                    new_config[property] = "27017"
-                else:
-                    new_config[property] = database_port
-            elif property in ["database_username", "database_password"]:
-                new_config[property] = input("Please set {0} (if none, just hit enter):\n".format(property)).strip()
+        if property in ["database_ip", "backend_ip", "frontend_ip"]:
+            ip = input("Do you want to set 'localhost' as {0}? If so, press enter. If not, please enter an ip. ".format(property)).strip()
+            if ip == "":
+                new_config[property] = "localhost"
             else:
-                new_config[property] = add_single_value(property)
+                new_config[property] = ip
+        elif property == "database_port":
+            database_port = input("Do you want to set '27017' as {0}? ('27017' is the default port of MongoDB) If so, press enter. If not, please enter a port. ".format(property)).strip()
+            if database_port == "":
+                new_config[property] = "27017"
+            else:
+                new_config[property] = database_port
+        elif property in ["database_username", "database_password"]:
+            new_config[property] = input("Please set {0} (if none, just hit enter):\n".format(property)).strip()
+        elif property == "database_authsource":
+            new_config[property] = input("Please set {0} (if none or default, just hit enter) (authsource is the database name associated with the user's credentials):\n".format(property)).strip()
+        else:
+            new_config[property] = add_single_value(property)
 
     config[part] = new_config
 
@@ -85,22 +66,11 @@ def create_config(part, properties):
     print("{0}That's it for {1} configuration.{2}".format(green, part, reset))
     print("You can update the configuration in viziot.conf file later.")
 
-def pypcap_property_convert(properties):
-    for i in range(len(properties)):
-        if properties[i] == 'ips':
-            properties[i] = {"name": "ips", "value": ["ip", "name"]}
-    return properties
-
 def check_config(part):
     if part in config.sections():
-        # print_config(part)
-        if part == 'pypcap':
-            all_properties = set(parts[part][part + "_properties_names"])
-        else:
-            all_properties = set(parts[part][part + "_properties"])
 
+        all_properties = set(property_dict[part])
         existed_properties = set(config.options(part))
-        existed_properties.remove("autostart")
         missing_properties = all_properties - existed_properties
         missing_properties_list = list(missing_properties)
 
@@ -112,7 +82,7 @@ def check_config(part):
             return True
     else:
         print("\nYou haven't set configuration for {0}. Let's set the configuration now!".format(part))
-        create_config(part, parts[part][part + "_properties"])
+        create_config(part, property_dict[part])
         return True
 
 # print backend url and frontend url
@@ -164,8 +134,29 @@ def main():
             print("Configuration file missing. Let's set the configuration now!")
 
             for part_name in parts_start:
-                create_config(part_name, parts[part_name][part_name + "_properties"])
+                create_config(part_name, property_dict[part_name])
 
+        # if pypcap or backend needs to be run, check if it can connect to the database and the iface is valid
+        print("Checking iface and database connection...")
+        if 'pypcap' in parts_start:
+            is_valid_iface, valid_ifaces = check_iface()
+            if not is_valid_iface:
+                print("{0}Error: The iface doesn't exist in your machine. Please correct the configuration. Valid iface: {1}{2}".format(red, ', '.join(valid_ifaces), reset))
+                return
+
+            mongo_uri = get_db_uri_from(config, 'pypcap')
+            if os.system("sudo python3 test_connection.py {0} 2>/dev/null".format(mongo_uri)) == 256:
+                print("{0}Error: Failed to connect to the database. Please check the configuration regarding the database{1}".format(red, reset))
+                return
+        else:
+            if 'backend' in parts_start:
+                print("Installing pymongo...")
+                os.system("sudo pip3 install pymongo 2>/dev/null")
+                mongo_uri = get_db_uri_from(config, 'backend')
+                if os.system("sudo python3 test_connection.py {0} 2>/dev/null".format(mongo_uri)) == 256:
+                    print("{0}Error: Failed to connect to the database. Please check the configuration regarding the database{1}".format(red, reset))
+                    return
+            
         print("Starting the project...")
         # for the frontend, an identifier is required to find the process, so that it can be stopped
         run(config, parts_start)

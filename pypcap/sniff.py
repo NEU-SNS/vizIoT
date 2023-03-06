@@ -3,7 +3,7 @@
 from scapy.all import *
 import pymongo
 from pymongo import MongoClient
-from config import mongo_uri, iface
+from config import mongo_uri, iface, database_name
 
 IP = 'IP'
 TCP = 'TCP'
@@ -14,7 +14,7 @@ HTTP = 'HTTP'
 
 writeConcern = pymongo.write_concern.WriteConcern(w=0, wtimeout=None, j=None, fsync=None)
 client = MongoClient(mongo_uri, serverSelectionTimeoutMS=1)
-scapy_database = client['scapy']
+scapy_database = client[database_name]
 http_data_collection = scapy_database['tcpdatas'].with_options(write_concern=writeConcern)
 scapy_database['tcpdatas'].create_index([('timestamp', pymongo.ASCENDING)],  expireAfterSeconds=3600)
 

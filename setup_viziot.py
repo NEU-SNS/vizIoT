@@ -23,25 +23,26 @@ def parseEnv(path):
 
 def kill_process(identifier):
     os.system("sudo ps -ef | grep " + identifier + " | grep -v grep | awk '{print $2}' | sudo xargs kill 2>/dev/null")
-    
+
+def get_db_uri_from(config, part):
+    if config.get(part, "database_username") and config.get(part, "database_password"):
+        auth_source = config.get(part, "database_authsource")
+        if auth_source:
+            auth_source = 'authSource=' + auth_source
+        mongo_uri = "mongodb://{0}:{1}@{2}:{3}/?{4}".format(config.get(part, "database_username"), config.get(part, "database_password"), config.get(part, "database_ip"), config.get(part, "database_port"), auth_source)
+    else:
+        mongo_uri = "mongodb://{0}:{1}/".format(config.get(part, "database_ip"), config.get(part, "database_port"))
+
+    return mongo_uri
+
 # ===================== pypcap =====================
 def set_pypcap_config(config):
     config_content = ""
-    ips_content = ""
-
-    if config.get("pypcap", "database_username") and config.get("pypcap", "database_password"):
-        mongo_uri = "mongodb://{0}:{1}@{2}:{3}/{4}".format(config.get("pypcap", "database_ip"), config.get("pypcap", "database_port"), config.get("pypcap", "database_username"), config.get("pypcap", "database_password"), config.get("pypcap", "database_name"))
-    else:
-        mongo_uri = "mongodb://{0}:{1}/{2}".format(config.get("pypcap", "database_ip"), config.get("pypcap", "database_port"), config.get("pypcap", "database_name"))
-    config_content += "mongo_uri" + "=\"{0}\"\n".format(mongo_uri) + "iface" + "=\"{0}\"\n".format(config.get("pypcap", "iface"))
-
-    for ip in eval(config.get("pypcap", "ips")):
-        ips_content += "{0} {1}\n".format(ip["ip"], ip["name"])
+    mongo_uri = get_db_uri_from(config, "pypcap")
+    config_content += "mongo_uri" + "=\"{0}\"\n".format(mongo_uri) + "database_name" + "=\"{0}\"\n".format(config.get("pypcap", "database_name")) + "iface" + "=\"{0}\"\n".format(config.get("pypcap", "iface"))
 
     with open('./pypcap/config.py', 'w') as f:
         f.write(config_content)
-    with open('./pypcap/ips.txt', 'w') as f:
-        f.write(ips_content)
 
 def execute_pypcap_command(is_first_time):
     os.chdir('./pypcap')
@@ -69,7 +70,10 @@ def run_pypcap(config, is_first_time):
 # ===================== backend =====================
 def set_backend_config(config):
     if config.get("backend", "database_username") and config.get("backend", "database_password"):
-        mongo_uri = "MONGO_URI=mongodb://{0}:{1}@{2}:{3}/{4}".format(config.get("backend", "database_ip"), config.get("backend", "database_port"), config.get("backend", "database_username"), config.get("backend", "database_password"), config.get("backend", "database_name"))
+        auth_source = config.get("backend", "database_authsource")
+        if auth_source:
+            auth_source = 'authSource=' + auth_source
+        mongo_uri = "MONGO_URI=mongodb://{0}:{1}@{2}:{3}/{4}?{5}".format(config.get("backend", "database_username"), config.get("backend", "database_password"), config.get("backend", "database_ip"), config.get("backend", "database_port"), config.get("backend", "database_name"), auth_source)
     else:
         mongo_uri = "MONGO_URI=mongodb://{0}:{1}/{2}".format(config.get("backend", "database_ip"), config.get("backend", "database_port"), config.get("backend", "database_name"))
 
@@ -84,7 +88,7 @@ def execute_backend_command(is_first_time, config):
     os.chdir('./backend')
     if is_first_time:
         print("Start installing packages for backend...")
-        os.system("sudo yarn install --quiet")
+        os.system("sudo yarn install 2>/dev/null")
 
     local_port = config.get("backend", "backend_port") or "3000"
 
@@ -132,13 +136,13 @@ def execute_frontend_command(is_first_time, env_changed, config):
     # install dependencies and create a package if it's the first time
     if is_first_time:
         print("Start installing packages for frontend...")
-        os.system("sudo yarn install --quiet")
-        print("Start building the project... (Please ignore the warning about 'caniuse-lite is outdated.')")
-        os.system("sudo npx webpack --config ./config/webpack.prod.js --env ip={0} --env port={1} --stats=errors-only".format(backend_ip, backend_port))
+        os.system("sudo yarn install 2>/dev/null")
+        print("Start building the project...")
+        os.system("sudo npx webpack --config ./config/webpack.prod.js --env ip={0} --env port={1}".format(backend_ip, backend_port))
     else:
         if env_changed:
-            print("The backend ip or port has changed. Rebuilding the project... (Please ignore the warning about 'caniuse-lite is outdated.')")
-            os.system("sudo npx webpack --config ./config/webpack.prod.js --env ip={0} --env port={1} --stats=errors-only".format(backend_ip, backend_port))
+            print("The backend ip or port has changed. Rebuilding the project...")
+            os.system("sudo npx webpack --config ./config/webpack.prod.js --env ip={0} --env port={1}".format(backend_ip, backend_port))
 
     # check if the machine has 'serve' 
     if os.system("sudo yarn global list --pattern serve | grep serve >/dev/null") != 0:
@@ -197,4 +201,4 @@ def run(config, parts):
         is_first_time = input("Is this your first time running the frontend? (y/other keys): ").strip()
         print("Starting the frontend. Please wait")
         run_frontend(config, is_first_time == "y")
-    
+ 

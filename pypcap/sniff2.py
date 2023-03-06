@@ -3,7 +3,7 @@ import time
 from scapy.all import *
 import pymongo
 from pymongo import MongoClient
-from config import MONGO_DB_ADDRESS
+from config import mongo_uri, iface, database_name
 
 
 
@@ -13,8 +13,8 @@ UDP = 'UDP'
 ETHER = 'Ether'
 
 writeConcern = pymongo.write_concern.WriteConcern(w=0, wtimeout=None, j=None, fsync=None)
-client = MongoClient(MONGO_DB_ADDRESS, serverSelectionTimeoutMS=1)
-scapy_database = client['scapy']
+client = MongoClient(mongo_uri, serverSelectionTimeoutMS=1)
+scapy_database = client[database_name]
 tcpAggregatedDataString = 'tcpAggregatedData'
 tcp_aggregated_data_collection = scapy_database[tcpAggregatedDataString].with_options(write_concern=writeConcern)
 
@@ -103,4 +103,4 @@ if __name__ == '__main__':
   # sniff(iface='en0', prn=http_header, filter="tcp or udp")
   # sniff(iface='en0', prn=http_header, filter="tcp port (80 or 443)")
   # sniff(iface='eth1', prn=http_header, filter="tcp port (80 or 443)", store=0)
-  sniff(iface='eth1', prn=http_header, filter="tcp or udp", store=0)
+  sniff(iface=iface, prn=http_header, filter="tcp or udp", store=0)

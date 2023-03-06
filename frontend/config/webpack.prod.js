@@ -4,6 +4,9 @@ const webpack = require('webpack');
 
 module.exports = (env) => merge(common, {
     mode: 'production',
+    stats: {
+        warnings: false
+    },
     plugins: [
         new webpack.DefinePlugin({
             'process.env': {
