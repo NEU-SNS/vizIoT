@@ -51,6 +51,7 @@ export const TodaySizeRoom = '/total/size';
 export const Size1MinRoom = '/total/size/1min';
 export const IndividualSizeRoom = '/individual/size/1s';
 export const ByDeviceSizeRoomToday = '/individual/size';
+export const ActiveDevice = '/device/active';
 export const IOCount = '/total/IO/1s';
 export const IOMetric = '/total/IO/metric/1s'
 export const ProtocolCount = '/total/protocol/1s';

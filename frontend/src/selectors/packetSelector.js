@@ -21,10 +21,10 @@ export const selectRealtimeVelocitySample = path(['packets', 'realtimeVelocitySa
 
 export const selectRealtimeVelocitySizeSample = path(['packets', 'realtimeVelocitySizeSample', 'data']);
 
-export const numberOfActiveDevices = state => {
-  const deviceVolumes = pathOr([], ['packets', 'packetPerDevice', 'data', 'size'], state);
-  return deviceVolumes.length;
-};
+// export const numberOfActiveDevices = state => {
+//   const deviceVolumes = pathOr([], ['packets', 'packetPerDevice', 'data', 'size'], state);
+//   return deviceVolumes.length;
+// };
 
 export const selectDeviceToLiveSamples = path(['packets', 'realtimeIndividualVelocitySizeSample', 'data']);
 

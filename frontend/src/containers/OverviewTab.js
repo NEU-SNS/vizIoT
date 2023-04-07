@@ -6,6 +6,7 @@ import Flex, {FlexDirection, JustifyContent} from '../components/BeanUILibrary/F
 import FlexSize from '../components/BeanUILibrary/FlexSize';
 import {fetchDevices} from '../actionsRequest/deviceRequest';
 import {pushIndividualSizeToday} from '../actions/packetActions';
+import {pushActiveDevices} from '../actions/deviceActions';
 import {
   analyzeAggregationByDevice,
   analyzeAggregationByDomain,
@@ -37,7 +38,8 @@ import {
   TodaySizeRoom,
   Size1MinRoom,
   IndividualSizeRoom,
-  ByDeviceSizeRoomToday
+  ByDeviceSizeRoomToday,
+  ActiveDevice
 } from '../socket/subscribe';
 import {H2, H4,} from '../components/BeanUILibrary/functional-css/TypographyStyles';
 import {fetchAnalytic} from 'VizIoT/actionsRequest/analyticRequest';
@@ -172,7 +174,8 @@ const OverviewTab = ({combinedNetworkDevice, mainChartConfig}) => {
   useSocket(TodaySizeRoom, message => pushSizeToday(message.size));
   useSocket(Size1MinRoom, message => pushSize1Min(message.size));
   useSocket(IndividualSizeRoom, pushRealtimeIndividualVelocitySizeSample);
-  useSocket(ByDeviceSizeRoomToday, pushIndividualSizeToday);
+  // useSocket(ByDeviceSizeRoomToday, pushIndividualSizeToday);
+  useSocket(ActiveDevice, pushActiveDevices);
 
   // useTimedFetcher(fetchAnalytic, DEVICE_HITS_REFRESH_DAY_MS);
   useTimedFetcher(fetchDevices, DEVICE_HITS_REFRESH_DAY_MS);

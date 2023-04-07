@@ -42,6 +42,11 @@ export const selectLastSeen = R.path(['devices', 'lastSeen', 'value']);
 
 export const selectNumberOfConnections = R.path(['device', 'numberOfConnections', 'value']);
 
+export const selectNumberOfActiveDevices = state => {
+  const activeDevices = R.pathOr([], ['devices', 'activeDevices', 'data'], state);
+  return activeDevices.length;
+};
+
 // export const selectPercentUnsecuredToday = state => {
 // const { analytics } = state;
 // const key = new AnalyticsRequest({

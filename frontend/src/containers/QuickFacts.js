@@ -29,6 +29,7 @@ import {
   selectTodaySize,
   selectVelocity1Min
 } from '../selectors/packetSelector';
+import {selectNumberOfActiveDevices} from '../selectors/deviceSelectors';
 import moment from 'moment';
 import {formatBytes} from '../utility/FormatUtility';
 
@@ -127,7 +128,7 @@ class QuickFacts extends PureComponent {
       },
       {
         title: 'Devices',
-        dataSelector: numberOfActiveDevices,
+        dataSelector: selectNumberOfActiveDevices,
         icon: 'directions_run',
       },
     ];

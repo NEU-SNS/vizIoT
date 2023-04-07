@@ -1,8 +1,10 @@
 import MomentUnit from '../../constants/MomentUnit';
 import {combineReducers} from 'redux';
+import {createReducer} from 'redux-act';
 import deviceList from './deviceList';
 import lastSeen from './lastSeen';
 import numberOfConnections from './numberOfConnections';
+import {pushActiveDevices} from 'VizIoT/actions/deviceActions'
 
 const defaultRefreshConfig = {
   default: {
@@ -28,10 +30,20 @@ const defaultNetwork = {
   alias: 'Network',
 };
 
+const activeDevices = createReducer({
+  [pushActiveDevices]: (state, newEntry) => {
+    return {
+      ...state,
+      data: newEntry,
+    }
+  },
+}, {data: null});
+
 export default combineReducers({
   entireNetwork: (state, action) => defaultNetwork,
   refreshConfig: (state, action) => defaultRefreshConfig,
   deviceList,
   lastSeen,
   numberOfConnections,
+  activeDevices
 });
