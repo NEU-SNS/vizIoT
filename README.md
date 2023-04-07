@@ -29,7 +29,7 @@ The backend component is written in Javascript. To run the backend component, se
 
 ### Pypcap
 
-The pypcap-monitor is written in Python with several actions automated in bash scripts. To run the pypcap-monitor, see the documentation in the VizIoT Installation markdown file.
+The pypcap is written in Python. To run the pypcap, see the documentation in the VizIoT Installation markdown file.
 
 ## Additional Documentation
 
