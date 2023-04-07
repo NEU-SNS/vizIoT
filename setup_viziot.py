@@ -1,12 +1,14 @@
 import os
 import subprocess
 import time
+import configparser
 
 red = '\033[31m'
 green = '\033[32m'
 reset = '\033[0m'
 
 original_dir = os.getcwd()
+config = configparser.ConfigParser()
 path = 'viziot.conf'
 
 def parseEnv(path):
@@ -20,9 +22,6 @@ def parseEnv(path):
         result[pair_list[0].strip()] = pair_list[1].strip()
     
     return result
-
-def kill_process(identifier):
-    os.system("sudo ps -ef | grep " + identifier + " | grep -v grep | awk '{print $2}' | sudo xargs kill 2>/dev/null")
 
 def get_db_uri_from(config, part):
     if config.get(part, "database_username") and config.get(part, "database_password"):
@@ -59,8 +58,9 @@ def execute_pypcap_command(is_first_time):
             print("{0}Error: You might have duplicate ip addresses. Please check ips.txt file{1}".format(red, reset))
 
     # start pypcap and set stdin=subprocess.PIPE, otherwise users can't enter values in the terminal
-    subprocess.Popen("sudo sh make-run.sh", shell=True, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    subprocess.Popen("sudo sh kill.sh", shell=True, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # subprocess.Popen("sudo sh make-run.sh", shell=True, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # subprocess.Popen("sudo sh kill.sh", shell=True, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.Popen("sudo python3 sniff.py", shell=True, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     os.chdir(original_dir)
 
 def run_pypcap(config, is_first_time):
@@ -145,6 +145,7 @@ def execute_frontend_command(is_first_time, env_changed, config):
             os.system("sudo npx webpack --config ./config/webpack.prod.js --env ip={0} --env port={1}".format(backend_ip, backend_port))
 
     # check if the machine has 'serve' 
+    # 'serve' is needed because it enables the frontend to run on a different system.
     if os.system("sudo yarn global list --pattern serve | grep serve >/dev/null") != 0:
         print("You need a package called 'serve' to run the frontend. Starting installing 'serve': ")
         os.system("sudo yarn global add serve@14.2.0")
@@ -170,20 +171,55 @@ def run_frontend(config, is_first_time):
     # It might not be necessary to have an .env file in the frontend
     env_changed = set_frontend_config(config)
     execute_frontend_command(is_first_time, env_changed, config)
+
+# ===================== check status =====================
+def check_status(identifier):
+    return os.system(f'ps -ef | grep {identifier} | grep -v grep >/dev/null') == 0
+
+def check_status_pypcap():
+    status = 'running' if check_status('sniff.py') else 'not started'
+    print(f'pypcap: {status}')
+
+def check_status_backend():
+    status = 'running' if check_status('forever') and check_status('vizIoT/backend/index.js') else 'not started'
+    print(f'backend: {status}')
+
+def check_status_frontend():
+    config.read(path)
+    if "frontend" not in config.sections():
+        print('frontend: not started')
+        return
     
-def stop(*frontend_process_identifier):
-    # stop pypcap
-    kill_process("sniff.py")
-    kill_process("kill.sh")
-    kill_process("make-run.sh")
+    frontend_ip = config.get("frontend", "frontend_ip") or "localhost"
+    frontend_port = config.get("frontend", "frontend_port") or "8080"
+    frontend_process_identifier = "tcp://{0}:{1}".format(frontend_ip, frontend_port)
 
-    # stop backend
-    kill_process("forever")
-    kill_process("vizIoT/backend/index.js")
+    status = 'running' if check_status(frontend_process_identifier) else 'not started'
+    print(f'frontend: {status}')
 
-    if frontend_process_identifier:
-    # stop frontend
-        kill_process(frontend_process_identifier[0])
+def check_status_all():
+    check_status_pypcap()
+    check_status_backend()
+    check_status_frontend()
+
+# ===================== stop application =====================
+def kill_process(identifier):
+    os.system("sudo ps -ef | grep " + identifier + " | grep -v grep | awk '{print $2}' | sudo xargs kill 2>/dev/null")
+
+def stop(part):
+    if part == 'pypcap':
+        kill_process("sniff.py")
+    elif part == 'backend':
+        kill_process("forever")
+        kill_process("vizIoT/backend/index.js")
+    elif part == 'frontend':
+        config.read(path)
+        if "frontend" in config.sections():
+            frontend_ip = config.get("frontend", "frontend_ip") or "localhost"
+            frontend_port = config.get("frontend", "frontend_port") or "8080"
+            # find the pid to stop the process
+            frontend_process_identifier = "tcp://{0}:{1}".format(frontend_ip, frontend_port)
+            kill_process(frontend_process_identifier)
 
 def run(config, parts):
     if "pypcap" in parts:

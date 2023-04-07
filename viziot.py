@@ -1,6 +1,6 @@
 import configparser
 import os
-from setup_viziot import run, stop, get_db_uri_from
+from setup_viziot import run, stop, get_db_uri_from, check_status_all
 import sys
 
 red = '\033[31m'
@@ -98,15 +98,23 @@ def print_url(parts):
 
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == 'stop':
-        config.read(path)
-        if "frontend" in config.sections():
-            frontend_ip = config.get("frontend", "frontend_ip") or "localhost"
-            frontend_port = config.get("frontend", "frontend_port") or "8080"
-            # find the pid to stop the process later
-            frontend_process_identifier = "tcp://{0}:{1}".format(frontend_ip, frontend_port)
-            stop(frontend_process_identifier)
+        
+        if len(sys.argv) == 2:
+            stop('pypcap')
+            stop('backend')
+            stop('frontend')
         else:
-            stop()
+            if "p" in sys.argv:
+                stop('pypcap')
+            if "b" in sys.argv:
+                stop('backend')
+            if "f" in sys.argv:
+                stop('frontend')
+
+        check_status_all()
+
+    elif len(sys.argv) > 1 and sys.argv[1] == 'status':
+        check_status_all()
 
     elif "p" in sys.argv or "b" in sys.argv or "f" in sys.argv:
         parts_start = []
@@ -162,6 +170,7 @@ def main():
         run(config, parts_start)
         print("{0}The project has started.{1}".format(green, reset))        
         print_url(parts_start)
+        print("You can check the status by executing this command 'sudo python3 viziot.py status'")
         print("You can stop it by executing this command 'sudo python3 viziot.py stop'")
     else:
         print("{0}Error: command not found{1}".format(red, reset))
