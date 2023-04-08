@@ -121,6 +121,13 @@ Note:: If there is an update in 'devices.txt' or 'ips.txt', please stop the appl
 	70:2c:1f:3b:39:53 labelprinter
 	...
 	```
+	Note:: All MAC address values must have at least 1 character, and if the value is less than 16, do not include a '0' value before that character. For example:
+	
+	```
+	0:e:f3:3b:85:e5
+	```
+	
+	is the proper way to format a MAC address with a 0 value or a value less than 16.
 	
 	Then run the following command:
 	
