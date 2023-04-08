@@ -23,13 +23,20 @@ Note:: MongoDB must be running before any other part of the application in order
 ### In production (use installation scripts)
 - Set up the pypcap
 
-	Add a file named 'devices.txt' at the top level directory of pypcap. Each line represents a device containing its mac address and name separated by a space. For example:
+	Add a file named 'devices.txt' at the top level directory of pypcap. Each line represents a device containing its MAC address and name separated by a space. For example:
 	
 	```
 	8c:1d:96:e8:da:dc fridge
 	70:2c:1f:3b:39:53 labelprinter
 	...
 	```
+	Note:: All MAC address values must have at least 1 character, and if the value is less than 16, do not include a '0' value before that character. For example:
+	
+	```
+	0:e:f3:3b:85:e5
+	```
+	
+	is the proper way to format a MAC address with a 0 value or a value less than 16.
 	
 	Add a file named 'ips.txt' at the top level directory of pypcap. Each line represents an ip containing its address and name separated by a space. For example:
 	
@@ -107,7 +114,7 @@ Note:: If there is an update in 'devices.txt' or 'ips.txt', please stop the appl
 
 - To place devices into the MongoDB instance, navigate to the pypcap directory:
 
-	Add a file named 'devices.txt' at the top level directory of pypcap. Each line represents a device containing its mac address and name separated by a space. For example:
+	Add a file named 'devices.txt' at the top level directory of pypcap. Each line represents a device containing its MAC address and name separated by a space. For example:
 	
 	```
 	8c:1d:96:e8:da:dc fridge
