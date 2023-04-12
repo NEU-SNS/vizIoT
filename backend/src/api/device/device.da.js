@@ -77,6 +77,10 @@ async function getConnections(startMS, endMS) {
         continue
       }
 
+      if (ip == undefined) {
+        continue
+      }
+
       let country = undefined
 
       const dnsIP = ip + ':' + port
