@@ -108,7 +108,7 @@ class DeviceCollectionNormalized extends Component {
 
             return (
               <DeviceCardWrapper
-                key={_id}
+                key={key}
                 space="m-bot-4"
               >
                 <DeviceCard
