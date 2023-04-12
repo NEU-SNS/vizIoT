@@ -128,13 +128,17 @@ const VizIoT = () => {
         <AppMenuBar toggleNav={onToggleNav} showNav={showNav}/>
         <Navigator location={location} isHidden={!showNav}/>
         {/*<ActivitySidebar />*/}
-        <CoverFlow
+        {/* The CSSTransition in CoverFlow somehow causes components to render twice.
+            I tried to alter the code based on https://reactcommunity.org/react-transition-group/with-react-router, but it didn't work.
+            Since it's just a small opacity transition, it's better not use it for now.
+        */}
+        {/* <CoverFlow
           keyName={location.pathname}
           // onLeft={handleLeftArrow}
           // onRight={handleRightArrow}
-        >
+        > */}
           <Outlet/>
-        </CoverFlow>
+        {/* </CoverFlow> */}
       </div>
     </div>
   );
