@@ -12,8 +12,7 @@ import {ConnectionTableTab} from '../containers/ConnectionTableTab'
 // exact prop means: exact path match
 
 export default () => {
-  const element = useRoutes(routes)
-  return <>{element}</>
+  return useRoutes(routes)
 }
 
 const routes = [
@@ -26,7 +25,7 @@ const routes = [
     element: <VizIoT/>,
     children: [
       {
-        path: `${Tabs[tabKeys.OVERVIEW].path}`,
+        path: Tabs[tabKeys.OVERVIEW].path,
         element: <OverviewTab/>
       },
       {
@@ -34,15 +33,15 @@ const routes = [
         element: <DeviceOverview/>
       },
       {
-        path: `${Tabs[tabKeys.INOUT].path}`,
+        path: Tabs[tabKeys.INOUT].path,
         element: <SentReceivedTab/>
       },
       {
-        path: `${Tabs[tabKeys.PROTOCOL].path}`,
+        path: Tabs[tabKeys.PROTOCOL].path,
         element: <ProtocolTab/>
       },
       {
-        path: `${Tabs[tabKeys.CONNECTION_TABLE].path}`,
+        path: Tabs[tabKeys.CONNECTION_TABLE].path,
         element: <ConnectionTableTab/>
       },
     ]
