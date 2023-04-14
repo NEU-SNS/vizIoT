@@ -21,6 +21,7 @@ import {
 import {useTimedFetcher} from '../components/BeanUILibrary/hooks/useTimedFetcher';
 import {fetchDeviceConnections} from '../data/api/devicesApi';
 import {useDimensions} from '../components/BeanUILibrary/hooks/useDimensions';
+import { useCustomTimer } from 'UIBean/hooks/useCustomTimer';
 
 // top level
 const ConnectionCard = styled(BCard)`
@@ -43,9 +44,14 @@ export const ConnectionTable = ({
   // set up fetchers and sockets
   useSocket(DeviceConnectionPackets1s, parseSecondConnectionPackets)
 
-  useTimedFetcher(fetchDeviceConnections, 1000)
-  useTimedFetcher(fetchFiveSecondConnections, 1000)
-  useTimedFetcher(fetchThirtySecondConnections, 1000)
+  // useTimedFetcher(fetchDeviceConnections, 1000)
+  // useTimedFetcher(fetchFiveSecondConnections, 1000)
+  // useTimedFetcher(fetchThirtySecondConnections, 1000)
+  
+  // replace the above useTimedFetchers with useCustomTimers
+  useCustomTimer(fetchDeviceConnections, 1000)
+  useCustomTimer(fetchFiveSecondConnections, 1000)
+  useCustomTimer(fetchThirtySecondConnections, 1000)
 
   // set up height refs to pass heights to child components
   const cardRef = useRef();
