@@ -3,13 +3,14 @@ const {getDeviceMap, getKnownIPMap} = require('../../util/DeviceMap')
 const {TcpDataModel} = require('../tcpData/tcpData.model')
 const {removeLeadingZeros} = require('../../util/FormatUtility')
 const maxmind = require('maxmind')
-const dns = require('dns')
+const dnsPromises = require('node:dns').promises;
 
 let db = undefined
 let countryIPs = {}
 let dnsHostNames = {}
 let macAddrs = {}
 let knownIPs = {}
+const untraceableDnsIPs = new Set()
 
 module.exports = {
   getAll,
@@ -96,13 +97,22 @@ async function getConnections(startMS, endMS) {
         }
       }
       // otherwise perform initial dns lookup for ip:port
+      /* Initially, dns.lookupService was used, which asynchronously looks up the hostname. 
+      The problem is it takes around 4-5 seconds to complete, but the next request comes in in about 1-2 seconds, which leads to a memory leak
+      Therefore, the promise version of lookupService is used here to avoid that. Also untraceableDnsIPs is used since sometimes the hostname can't be found and the lookup shouldn't be repeated
+      However, it's not perfect. For the first few requests, it's gonna take a lot of time to respond, since the dnsIPs are not in dnsHostNames nor in untraceableDnsIPs, and dnsPromises.lookupService needs to be invoked
+      Althought it becomes faster and faster when dnsHostNames and untraceableDnsIPs grow bigger, it's still not fast enough as long as there are dnsIPs not in them, which needs to be improved.
+       */
       else {
-        await dns.lookupService(ip, port, (err, hostname, service) => {
-          if (!err) {
+        if (!untraceableDnsIPs.has(dnsIP)) {
+          try {
+            const {hostname} = await dnsPromises.lookupService(ip, port) 
             destName = hostname
             dnsHostNames[dnsIP] = hostname
+          } catch (e) { 
+            untraceableDnsIPs.add(dnsIP)
           }
-        })
+        }
       }
 
       // handle grabbing
