@@ -53,9 +53,9 @@ def execute_pypcap_command(is_first_time):
         os.system("sudo pip3 install pymongo 2>/dev/null")
 
         if os.system("sudo python3 addDevices.py 2>/dev/null") == 256:
-            print("{0}Error: You might have duplicate mac addresses. Please check devices.txt file{1}".format(red, reset))
+            print("{0}Error: Fail to add devices info to the database. Please check devices.txt file{1}".format(red, reset))
         if os.system("sudo python3 addIPs.py 2>/dev/null") == 256:
-            print("{0}Error: You might have duplicate ip addresses. Please check ips.txt file{1}".format(red, reset))
+            print("{0}Error: Fail to add ips info info to the database. Please check ips.txt file{1}".format(red, reset))
 
     # start pypcap and set stdin=subprocess.PIPE, otherwise users can't enter values in the terminal
     # subprocess.Popen("sudo sh make-run.sh", shell=True, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
