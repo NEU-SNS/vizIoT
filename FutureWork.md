@@ -11,7 +11,7 @@ This bug doesn't happen in other tabs.
 
 ## Performance improvement
 
-1. In the 'Connection' tab, it sends serveral http requests to the backend on a regular basis. It might be doable to use websocket instead, just like the other tabs.
-2. In the 'Connection' tab, it uses dnsPromises.lookupService to look up each packet's hostname, which takes about 4-5 seconds and there are thousands of packets in one request,
-so it's takes a few minutes to process the first few requests. That's why in the first few minutes after the application is started, there is no chart. Since there is an object and a set collecting hostnames looked up before, the following requests are faster. However, even 
-there is just one packet whose hostname is new, the request would take an intolerable amount of time to complete.
+1. Replace Redis with MongoDB.
+2. Add a data access layer.
+3. In the 'Connection' tab, it sends several http requests to the backend on a regular basis. It might be doable to use websocket instead, just like the other tabs.
+4. In the 'Connection' tab, it uses dnsPromises.lookupService to look up each packet's hostname, which takes about 4-5 seconds and there are thousands of packets in one request, so it's takes a few minutes to process the first few requests. That's why in the first few minutes after the application is started, there is no chart. Since there is an object and a set collecting hostnames looked up before, the following requests are faster. However, even there is just one packet whose hostname is new, the request would take an intolerable amount of time to complete.
