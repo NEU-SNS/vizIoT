@@ -1,7 +1,6 @@
 const _ = require('lodash')
 const {standardize} = require('mac-address-util')
 const {TcpDataModel} = require('./tcpData.model')
-const {TcpAggregatedDataModel} = require('./tcpAggregatedData.model')
 const {DeviceModel} = require('../device/device.model')
 const {getStartOfToday, getNow} = require('../../util/time')
 const {removeLeadingZeros} = require('../../util/FormatUtility')
@@ -23,6 +22,7 @@ module.exports = {
   getAggregateProtocolDataWithinNSeconds,
   getDeviceProtocolDataWithinNSeconds,
   populateDeviceMap,
+  deleteOldData
 }
 
 let macAddrs = {}
@@ -189,16 +189,6 @@ async function getAggregateCountDataByTime(startMS, endMS) {
     {$group: {_id: null, count: {$sum: 1}}},
   ])
 
-  const resultsFromAggregatedData = await TcpAggregatedDataModel.aggregate([
-    {
-      $match: {
-        startMS: {$gte: startMS},
-        endMS: {$lte: endMS},
-      },
-    },
-    {$group: {_id: null, count: {$sum: '$packetCount'}}},
-  ])
-
   let count = 0
 
   if (resultsFromTcpData.length > 0) {
@@ -206,11 +196,6 @@ async function getAggregateCountDataByTime(startMS, endMS) {
     count += resultsFromTcpData[0].count
   }
 
-  if (resultsFromAggregatedData.length > 0) {
-    // console.log('resultsFromAggregatedData: ' + resultsFromAggregatedData[0].count)
-
-    count += resultsFromAggregatedData[0].count
-  }
   return count
 }
 
@@ -225,26 +210,11 @@ async function getAggregateSizeDataByTime(startMS, endMS) {
     {$group: {_id: null, size: {$sum: '$packet_size'}}},
   ])
 
-  const resultsFromAggregatedData = await TcpAggregatedDataModel.aggregate([
-    {
-      $match: {
-        startMS: {$gte: startMS},
-        endMS: {$lte: endMS},
-      },
-    },
-    {$group: {_id: null, size: {$sum: '$totalPacketSize'}}},
-  ])
-
   let size = 0
 
   if (resultsFromTcpData.length > 0) {
     // console.log('resultsFromTcpData: ' + resultsFromTcpData[0].size)
     size += resultsFromTcpData[0].size
-  }
-
-  if (resultsFromAggregatedData.length > 0) {
-    // console.log('resultsFromAggregatedData: ' + resultsFromAggregatedData[0].size)
-    size += resultsFromAggregatedData[0].size
   }
 
   return size
@@ -261,27 +231,15 @@ async function getAggregateMacAddressSizeDataByTime(startMS, endMS) {
     {$group: {_id: {src_mac: '$src_mac', dst_mac: '$dst_mac'}, size: {$sum: '$packet_size'}}},
   ])
 
-  const aggregateDataPromise = TcpAggregatedDataModel.aggregate([
-    {
-      $match: {
-        startMS: {$gte: startMS},
-        endMS: {$lte: endMS},
-      },
-    },
-    {$group: {_id: {src_mac: '$src_mac', dst_mac: '$dst_mac'}, size: {$sum: '$totalPacketSize'}}},
-  ])
-
   const devicesDataPromise = DeviceModel.find()
   // parallel promises
-  const values = await Promise.all([tcpDataPromise, aggregateDataPromise, devicesDataPromise])
+  const values = await Promise.all([tcpDataPromise, devicesDataPromise])
 
   const resultsFromTcpData = values[0]
-  const resultsFromAggregatedData = values[1]
-  const devices = values[2]
+  const devices = values[1]
   const deviceMap = convertDeviceListToMap(devices)
 
-  const combinedArray = resultsFromTcpData.concat(resultsFromAggregatedData)
-  const resultMap = buildSizeMacAddressData(combinedArray)
+  const resultMap = buildSizeMacAddressData(resultsFromTcpData)
   const results = mapMacAddressToDeviceName(resultMap, deviceMap)
 
   return results
@@ -620,5 +578,9 @@ async function getConnectionSentReceivedDataWithinNSeconds(pastMS) {
 
 }
 
+async function deleteOldData(timeToBeDeleted) {
+  const {deletedCount} = await TcpDataModel.deleteMany({timestamp: {$lte: timeToBeDeleted}})
+  return deletedCount
+}
 
 

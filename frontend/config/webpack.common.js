@@ -101,8 +101,10 @@ module.exports = {
       $: 'jquery',
       jquery: 'jquery',
     }),
-    new CopyWebpackPlugin([
-      { from: assetsPath, to: distPath }
-    ]),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: assetsPath, to: distPath }
+      ]
+    }),
   ],
 };

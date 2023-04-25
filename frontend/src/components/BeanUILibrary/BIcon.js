@@ -4,6 +4,7 @@ import React, {Component, PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import classNames from 'classnames';
+import * as eva from 'eva-icons';
 
 const IconContainer = styled.i`
   font-size: ${({size}) => size}px;

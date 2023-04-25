@@ -3,7 +3,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import {shouldUpdate} from 'recompose';
 
 import Flex, {JustifyContent} from 'UIBean/Flex';
 import FlexChild from 'UIBean/FlexChild';
@@ -115,18 +114,18 @@ const DEFAULT_VAL = '~';
 
 const renderFacts = (cardFacts, providedFacts) => {
   if (providedFacts) {
-    return providedFacts.map(fact => {
+    return providedFacts.map((fact, index) => {
       return (
-        <DeviceDownloadMetrics style={{color: fact.color}}>
+        <DeviceDownloadMetrics key={index} style={{color: fact.color}}>
           <BIcon type={'fas'} name={fact.icon}
                  color={fact.color}/> {formatBytes(fact.data, undefined, 0) || DEFAULT_VAL}
         </DeviceDownloadMetrics>
       )
     })
   } else {
-    return cardFacts.map(fact => {
+    return cardFacts.map((fact, index) => {
       return (
-        <DeviceDownloadMetrics style={{color: fact.color}}>
+        <DeviceDownloadMetrics key={index} style={{color: fact.color}}>
           <BIcon type={'fas'} name={fact.icon} color={fact.color}/> {fact.data || DEFAULT_VAL}
         </DeviceDownloadMetrics>
       )

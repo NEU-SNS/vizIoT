@@ -11,7 +11,7 @@ import BCard from 'UIBean/BCard';
 import SectionTitle from 'VizIoT/components/SectionTitle';
 import DeviceList from 'VizIoT/components/device/DeviceList';
 import ActivityFeed from 'VizIoT/components/ActivityFeed';
-import connect from 'react-redux/es/connect/connect';
+import {connect} from 'react-redux';
 import {
   selectDeviceList,
   selectLastSeen,

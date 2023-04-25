@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "UIBean/*": ["./src/components/BeanUILibrary/*"],
+      "VizIoT/*": ["./src/*"],
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}

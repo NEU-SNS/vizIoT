@@ -8,7 +8,6 @@ import {
   CARD_COLOR, HOVER_FILL_COLOR,
 } from 'VizIoT/styles/base/viz-theme';
 import {withClickable} from 'UIBean/CommonHOC';
-import {pure, compose} from 'recompose';
 
 export const ButtonShape = {
   ICON: 'ICON',
@@ -78,7 +77,4 @@ BButton.propTypes = {
   orientation: PropTypes.oneOf(ButtonOrientationList),
 };
 
-export default compose(
-  pure,
-  withClickable(BButton)
-);
+export default React.memo(withClickable(BButton))

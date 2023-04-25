@@ -11,5 +11,8 @@ node_modules
 # Editor
 .idea
 
+# Environment Variable
+.env
+
 # Other
 .DS_Store

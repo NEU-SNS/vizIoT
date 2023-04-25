@@ -13,7 +13,7 @@ import {useInterval} from 'UIBean/hooks/useInterval';
 import {useScroll} from 'UIBean/hooks/useScroll';
 
 const Background = styled(Flex)`
-  ${_sticky}
+  ${_sticky}; // It seems that it's ok to lack a trailing semicolon in styled-components v3, but it's not in v5
   top: 0;
   right: 0;
   width: 28rem;

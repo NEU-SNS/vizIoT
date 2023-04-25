@@ -21,6 +21,7 @@ import {
 import {useTimedFetcher} from '../components/BeanUILibrary/hooks/useTimedFetcher';
 import {fetchDeviceConnections} from '../data/api/devicesApi';
 import {useDimensions} from '../components/BeanUILibrary/hooks/useDimensions';
+import { useCustomTimer } from 'UIBean/hooks/useCustomTimer';
 
 // top level
 const ConnectionCard = styled(BCard)`
@@ -43,9 +44,14 @@ export const ConnectionTable = ({
   // set up fetchers and sockets
   useSocket(DeviceConnectionPackets1s, parseSecondConnectionPackets)
 
-  useTimedFetcher(fetchDeviceConnections, 1000)
-  useTimedFetcher(fetchFiveSecondConnections, 1000)
-  useTimedFetcher(fetchThirtySecondConnections, 1000)
+  // useTimedFetcher(fetchDeviceConnections, 1000)
+  // useTimedFetcher(fetchFiveSecondConnections, 1000)
+  // useTimedFetcher(fetchThirtySecondConnections, 1000)
+  
+  // replace the above useTimedFetchers with useCustomTimers
+  useCustomTimer(fetchDeviceConnections, 1000)
+  useCustomTimer(fetchFiveSecondConnections, 1000)
+  useCustomTimer(fetchThirtySecondConnections, 1000)
 
   // set up height refs to pass heights to child components
   const cardRef = useRef();
@@ -163,7 +169,7 @@ export const ConnectionTable = ({
         height={headerSize}
         width={width}
       />
-      {displayConnections.map(conn => {
+      {displayConnections.map((conn, index) => {
         ++renderIndex;
         // console.log(conn)
         // console.log(packets)
@@ -177,6 +183,7 @@ export const ConnectionTable = ({
         }
         // console.log(currentPackets)
         return <TableRow
+          key={index}
           name={conn.name}
           destName={conn.destName}
           data={currentPackets ? currentPackets : []}
@@ -194,8 +201,9 @@ export const ConnectionTable = ({
           width={width}
         />
       })}
-      {[...Array(rows - renderIndex)].map(x => {
+      {[...Array(rows - renderIndex)].map((x, index) => {
         return <BlankRow
+          key={index}
           sentColor={sentColor}
           receivedColor={receivedColor}
           height={rowSize}
@@ -214,7 +222,7 @@ ConnectionTable.propTypes = {
   xTicks: PropTypes.number,
   sentColor: PropTypes.string,
   receivedColor: PropTypes.string,
-  height: PropTypes.number.isRequired,
+  height: PropTypes.string.isRequired,
   devices: PropTypes.object.isRequired,
 }
 

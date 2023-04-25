@@ -8,6 +8,7 @@ const routesConfig = require('./config/routes')
 
 const DeviceDa = require('./api/device/device.da')
 const TcpDa = require('./api/tcpData/tcpData.da')
+const TcpSocketDa = require('./api/tcpData/tcpData.socket.da')
 
 class Server {
   constructor() {
@@ -44,6 +45,11 @@ class Server {
       .then(r => console.log('Populated device map in tcpda'))
       .catch(e => console.log('error populating device map'))
 
+    // populate device map for websocket
+    TcpSocketDa.populateDeviceMap()
+      .then(r => console.log('Populated device map in tcpda.socket'))
+      .catch(e => console.log('error populating device map'))
+
     // connect to database
     mongoose.connect(this.config.db, {useNewUrlParser: true})
       .then(() => {
@@ -55,7 +61,7 @@ class Server {
         initSocketIO(this.http)
 
         // start server
-        this.http.listen(this.config.apiPort, () => {
+        this.http.listen(this.config.apiPort, this.config.ip, () => {
           console.log(`[Server] listening on port ${this.config.apiPort}`)
         })
       })

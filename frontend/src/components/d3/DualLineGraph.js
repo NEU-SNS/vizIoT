@@ -25,8 +25,8 @@ const drawXLabels = (ticks, maxTime, start, end, yPos) => {
   }
 
   return <g>
-    {skipPos.map(tick => {
-      return <g>
+    {skipPos.map((tick, index) => {
+      return <g key={index}>
         <text x={tick.pos - textXXOffset} y={yPos + textXYOffset} fill={strokeColor} fontSize={10}>{tick.time}sec</text>
         <line
           x1={tick.pos}

@@ -9,7 +9,6 @@ import {
 } from '../styles/base/viz-theme';
 import BIcon from 'UIBean/BIcon';
 import {H0, H1, H3, H5, H6} from 'UIBean/functional-css/TypographyStyles';
-import {pure} from 'recompose';
 
 const Sizes = {
   XSMALL: 'xsm',
@@ -77,4 +76,4 @@ SectionTitle.defaultProps = {
   size: Sizes.SMALL,
 };
 
-export default pure(SectionTitle);
+export default React.memo(SectionTitle);

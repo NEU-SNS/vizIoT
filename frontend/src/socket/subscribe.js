@@ -1,6 +1,6 @@
 'use es6';
 
-import openSocket from 'socket.io-client';
+import { io } from 'socket.io-client';
 import {baseUrl} from '../constants/RequestConstants';
 
 export const url = `${baseUrl}/chat`;
@@ -17,7 +17,7 @@ export const createSocket = customUrl => {
     return;
   }
   // debugger
-  const socket = openSocket.connect(connectUrl);
+  const socket = io(connectUrl);
   socket.on('connect', () => {
     console.log(`connected: ${connectUrl}`);
   });
@@ -51,6 +51,7 @@ export const TodaySizeRoom = '/total/size';
 export const Size1MinRoom = '/total/size/1min';
 export const IndividualSizeRoom = '/individual/size/1s';
 export const ByDeviceSizeRoomToday = '/individual/size';
+export const ActiveDevice = '/device/active';
 export const IOCount = '/total/IO/1s';
 export const IOMetric = '/total/IO/metric/1s'
 export const ProtocolCount = '/total/protocol/1s';

@@ -1,14 +1,14 @@
 'use es6';
 
 import React, {Component} from 'react';
-import openSocket from 'socket.io-client';
+import {io} from 'socket.io-client';
 import SocketContext from '../context/SocketContext';
 import {url} from '../../../socket/subscribe';
 
 export default class SocketProvider extends Component {
   constructor(props) {
     super(props);
-    this.socket = openSocket.connect(props.url || url);
+    this.socket = io(props.url || url);
     console.log('socket opened SocketProvider');
 
   }

@@ -594,7 +594,7 @@ Note:: To change the length of time over which the Protocol and Sent/Received in
 		
 	Note:: In order to change the interval over which data is collected, make the appropriate changes to the backend serving the data in tcpData.ctrl.js, create a fetcher in connectionsApi.js for the new metric, assign an enumerable to the *METRICS* enumerable in this file, and create a new case in the switch statement in this function. Then, assign the new metric to either *metric1* or *metric2* depending on the column changed.
 
-## **Pypcap-Monitor**
+## **Pypcap**
 
 - addDevices.py
 

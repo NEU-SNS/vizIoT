@@ -5,6 +5,7 @@
 const defaultConfig = {
   apiPort: process.env.PORT || 3000,
   db: process.env['MONGO_URI'],
+  ip: process.env['LOCAL_IP']
 }
 
 /**
